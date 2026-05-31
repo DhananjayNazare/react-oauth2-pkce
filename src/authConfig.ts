@@ -5,7 +5,9 @@ function stringIsUnset(value: string | null | undefined) {
   return unset.includes(value)
 }
 
-export function createInternalConfig(passedConfig: TAuthConfig): TInternalConfig {
+export function createInternalConfig(
+  passedConfig: TAuthConfig,
+): TInternalConfig {
   // Set default values for internal config object
   const {
     redirectUri = undefined,
@@ -17,7 +19,7 @@ export function createInternalConfig(passedConfig: TAuthConfig): TInternalConfig
     postLogin = () => null,
     loginMethod = 'redirect',
     onRefreshTokenExpire = undefined,
-    storage = 'local',
+    storage = 'local' as const,
     storageKeyPrefix = 'ROCP_',
     refreshWithScope = true,
     refreshTokenExpiryStrategy = 'renewable',
@@ -47,24 +49,27 @@ export function createInternalConfig(passedConfig: TAuthConfig): TInternalConfig
 
 export function validateConfig(config: TInternalConfig) {
   if (stringIsUnset(config?.clientId))
-    throw Error("'clientId' must be set in the 'AuthConfig' object passed to 'react-oauth2-code-pkce' AuthProvider")
+    throw Error(
+      "'clientId' must be set in the 'AuthConfig' object passed to 'react-oauth2-code-pkce' AuthProvider",
+    )
   if (stringIsUnset(config?.authorizationEndpoint))
     throw Error(
-      "'authorizationEndpoint' must be set in the 'AuthConfig' object passed to 'react-oauth2-code-pkce' AuthProvider"
+      "'authorizationEndpoint' must be set in the 'AuthConfig' object passed to 'react-oauth2-code-pkce' AuthProvider",
     )
   if (stringIsUnset(config?.tokenEndpoint))
     throw Error(
-      "'tokenEndpoint' must be set in the 'AuthConfig' object passed to 'react-oauth2-code-pkce' AuthProvider"
+      "'tokenEndpoint' must be set in the 'AuthConfig' object passed to 'react-oauth2-code-pkce' AuthProvider",
     )
-  if (!['session', 'local'].includes(config.storage)) throw Error("'storage' must be one of ('session', 'local')")
+  if (!['session', 'local', 'memory'].includes(config.storage))
+    throw Error("'storage' must be one of ('session', 'local', 'memory')")
   if (config?.extraAuthParams)
     console.warn(
       "The 'extraAuthParams' configuration parameter will be deprecated. You should use " +
-        "'extraTokenParameters' instead."
+        "'extraTokenParameters' instead.",
     )
   if (config?.extraAuthParams && config?.extraTokenParameters)
     console.warn(
       "Using both 'extraAuthParams' and 'extraTokenParameters' is not recommended. " +
-        "They do the same thing, and you should only use 'extraTokenParameters'"
+        "They do the same thing, and you should only use 'extraTokenParameters'",
     )
 }

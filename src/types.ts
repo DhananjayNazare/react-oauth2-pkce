@@ -20,7 +20,9 @@ export interface TTokenRequestForRefresh extends TTokenRqBase {
   refresh_token: string
 }
 
-export type TTokenRequest = TTokenRequestWithCodeAndVerifier | TTokenRequestForRefresh
+export type TTokenRequest =
+  | TTokenRequestWithCodeAndVerifier
+  | TTokenRequestForRefresh
 
 export type TTokenData = {
   // biome-ignore lint: It really can be `any` (almost)
@@ -52,11 +54,19 @@ export interface IAuthProvider {
   children: ReactNode
 }
 
-type TLogInFunction = (state?: string, additionalParameters?: TPrimitiveRecord, method?: TLoginMethod) => void
+type TLogInFunction = (
+  state?: string,
+  additionalParameters?: TPrimitiveRecord,
+  method?: TLoginMethod,
+) => void
 export interface IAuthContext {
   token: string
   logIn: TLogInFunction
-  logOut: (state?: string, logoutHint?: string, additionalParameters?: TPrimitiveRecord) => void
+  logOut: (
+    state?: string,
+    logoutHint?: string,
+    additionalParameters?: TPrimitiveRecord,
+  ) => void
   /** @deprecated Use `logIn` instead */
   login: TLogInFunction
   error: string | null
@@ -94,7 +104,7 @@ export type TAuthConfig = {
   tokenExpiresIn?: number
   refreshTokenExpiresIn?: number
   refreshTokenExpiryStrategy?: 'renewable' | 'absolute'
-  storage?: 'session' | 'local'
+  storage?: 'session' | 'local' | 'memory'
   storageKeyPrefix?: string
   refreshWithScope?: boolean
   tokenRequestCredentials?: RequestCredentials
