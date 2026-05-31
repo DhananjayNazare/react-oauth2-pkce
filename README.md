@@ -152,11 +152,17 @@ type TAuthConfig = {
   // By default, the package will automatically redirect the user to the login server if not already logged in.
   // If set to false, you need to call the "logIn()" function to log in (e.g. with a "Log in" button)
   autoLogin?: boolean  // default: true
-  // Store login state in 'localStorage' or 'sessionStorage'
-  // If set to 'session', no login state is persisted by 'react-oauth2-code-pkce` when the browser closes.
+  // Store login state in 'localStorage', 'sessionStorage', or in-memory.
+  // 'local'    - Persisted across browser sessions (survives page refresh and browser restart).
+  // 'session'  - Persisted for the browser tab lifetime only; cleared when the tab is closed.
+  // 'memory'   - Held in a module-level Map; never written to disk or browser storage.
+  //              State is lost on page refresh. Useful for SSR environments, incognito
+  //              restrictions, or embedded contexts where browser storage is unavailable.
+  //              NOTE: PKCE verifier and auth state are stored in sessionStorage during the
+  //              login redirect so the callback page can still complete the code exchange.
   // NOTE: Many authentication servers will keep the client logged in by cookies. You should therefore use 
   // the logOut() function to properly log out the client. Or configure your server not to issue cookies.
-  storage?: 'local' | 'session'  // default: 'local'
+  storage?: 'local' | 'session' | 'memory'  // default: 'local'
   // Sets the prefix for keys used by this library in storage
   storageKeyPrefix?: string // default: 'ROCP_'
   // Set to false if you need to access the urlParameters sent back from the login server.
