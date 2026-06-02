@@ -1,4 +1,7 @@
 {
+  "formatter": {
+    "enabled": true
+  },
   "javascript": {
     "formatter": {
       "indentStyle": "space",

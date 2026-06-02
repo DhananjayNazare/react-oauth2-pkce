@@ -4,6 +4,7 @@
   "scripts": {
     "start": "vite",
     "build": "vite build",
+    "format": "biome format --write .",
     "test": "jest --silent",
     "test:watch": "jest --silent --watch"
   },
@@ -12,6 +13,7 @@
     "react-dom": "18.3.1"
   },
   "devDependencies": {
+    "@biomejs/biome": "^2.4.16",
     "@testing-library/dom": "^10.4.0",
     "@testing-library/jest-dom": "^6.6.3",
     "@testing-library/react": "^16.0.1",

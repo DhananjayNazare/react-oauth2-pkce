@@ -18,7 +18,7 @@ export async function redirectToLogin(
   config: TInternalConfig,
   customState?: string,
   additionalParameters?: TPrimitiveRecord,
-  method: TLoginMethod = 'redirect',
+  method: TLoginMethod = 'redirect'
 ): Promise<void> {
   // For 'memory' storage the in-memory state is lost on redirect, so PKCE
   // verifier and auth state are kept in sessionStorage to survive the round-trip.
@@ -28,8 +28,7 @@ export async function redirectToLogin(
   // Create and store a random string in storage, used as the 'code_verifier'
   const codeVerifier = generateRandomString(96)
   // Prefix the code verifier key name to prevent multi-application collisions
-  const codeVerifierStorageKeyName =
-    config.storageKeyPrefix + codeVerifierStorageKey
+  const codeVerifierStorageKeyName = config.storageKeyPrefix + codeVerifierStorageKey
   storage.setItem(codeVerifierStorageKeyName, codeVerifier)
 
   // Hash and Base64URL encode the code_verifier, used as the 'code_challenge'
@@ -68,48 +67,40 @@ export async function redirectToLogin(
       const handle: null | WindowProxy = window.open(
         loginUrl,
         'loginPopup',
-        `width=${width},height=${height},top=${top},left=${left}`,
+        `width=${width},height=${height},top=${top},left=${left}`
       )
       if (handle) return
-      console.warn(
-        'Popup blocked. Redirecting to login page. Disable popup blocker to use popup login.',
-      )
+      console.warn('Popup blocked. Redirecting to login page. Disable popup blocker to use popup login.')
     }
     window.location[navigationMethod](loginUrl)
   })
 }
 
 // This is called a "type predicate". Which allow us to know which kind of response we got, in a type safe way.
-function isTokenResponse(
-  body: unknown | TTokenResponse,
-): body is TTokenResponse {
+function isTokenResponse(body: unknown | TTokenResponse): body is TTokenResponse {
   return (body as TTokenResponse).access_token !== undefined
 }
 
 function postTokenRequest(
   tokenEndpoint: string,
   tokenRequest: TTokenRequest,
-  credentials: RequestCredentials,
+  credentials: RequestCredentials
 ): Promise<TTokenResponse> {
   return postWithXForm({
     url: tokenEndpoint,
     request: tokenRequest,
     credentials: credentials,
   }).then((response) => {
-    return response
-      .json()
-      .then((body: TTokenResponse | unknown): TTokenResponse => {
-        if (isTokenResponse(body)) {
-          return body
-        }
-        throw Error(JSON.stringify(body))
-      })
+    return response.json().then((body: TTokenResponse | unknown): TTokenResponse => {
+      if (isTokenResponse(body)) {
+        return body
+      }
+      throw Error(JSON.stringify(body))
+    })
   })
 }
 
-export const fetchTokens = (
-  config: TInternalConfig,
-): Promise<TTokenResponse> => {
+export const fetchTokens = (config: TInternalConfig): Promise<TTokenResponse> => {
   // Mirror the storage selection used in redirectToLogin.
   const storage = config.storage === 'local' ? localStorage : sessionStorage
   /*
@@ -120,19 +111,14 @@ export const fetchTokens = (
   const urlParams = new URLSearchParams(window.location.search)
   const authCode = urlParams.get('code')
   // Prefix the code verifier key name to prevent multi-application collisions
-  const codeVerifierStorageKeyName =
-    config.storageKeyPrefix + codeVerifierStorageKey
+  const codeVerifierStorageKeyName = config.storageKeyPrefix + codeVerifierStorageKey
   const codeVerifier = storage.getItem(codeVerifierStorageKeyName)
 
   if (!authCode) {
-    throw Error(
-      "Parameter 'code' not found in URL. \nHas authentication taken place?",
-    )
+    throw Error("Parameter 'code' not found in URL. \nHas authentication taken place?")
   }
   if (!codeVerifier) {
-    throw Error(
-      "Can't get tokens without the CodeVerifier. \nHas authentication taken place?",
-    )
+    throw Error("Can't get tokens without the CodeVerifier. \nHas authentication taken place?")
   }
 
   const tokenRequest: TTokenRequestWithCodeAndVerifier = {
@@ -145,11 +131,7 @@ export const fetchTokens = (
     // TODO: Remove in 2.0
     ...config.extraAuthParams,
   }
-  return postTokenRequest(
-    config.tokenEndpoint,
-    tokenRequest,
-    config.tokenRequestCredentials,
-  )
+  return postTokenRequest(config.tokenEndpoint, tokenRequest, config.tokenRequestCredentials)
 }
 
 export const fetchWithRefreshToken = (props: {
@@ -165,11 +147,7 @@ export const fetchWithRefreshToken = (props: {
     ...config.extraTokenParameters,
   }
   if (config.refreshWithScope) refreshRequest.scope = config.scope
-  return postTokenRequest(
-    config.tokenEndpoint,
-    refreshRequest,
-    config.tokenRequestCredentials,
-  )
+  return postTokenRequest(config.tokenEndpoint, refreshRequest, config.tokenRequestCredentials)
 }
 
 export function redirectToLogout(
@@ -179,7 +157,7 @@ export function redirectToLogout(
   idToken?: string,
   state?: string,
   logoutHint?: string,
-  additionalParameters?: TPrimitiveRecord,
+  additionalParameters?: TPrimitiveRecord
 ) {
   const params = new URLSearchParams({
     token: refresh_token || token,
@@ -192,24 +170,19 @@ export function redirectToLogout(
   if (idToken) params.append('id_token_hint', idToken)
   if (state) params.append('state', state)
   if (logoutHint) params.append('logout_hint', logoutHint)
-  if (config.logoutRedirect)
-    params.append('post_logout_redirect_uri', config.logoutRedirect)
-  if (!config.logoutRedirect && config.redirectUri)
-    params.append('post_logout_redirect_uri', config.redirectUri)
+  if (config.logoutRedirect) params.append('post_logout_redirect_uri', config.logoutRedirect)
+  if (!config.logoutRedirect && config.redirectUri) params.append('post_logout_redirect_uri', config.redirectUri)
 
   window.location.assign(`${config.logoutEndpoint}?${params.toString()}`)
 }
 
-export function validateState(
-  urlParams: URLSearchParams,
-  storageType: TInternalConfig['storage'],
-) {
+export function validateState(urlParams: URLSearchParams, storageType: TInternalConfig['storage']) {
   const storage = storageType === 'local' ? localStorage : sessionStorage
   const receivedState = urlParams.get('state')
   const loadedState = storage.getItem(stateStorageKey)
   if (receivedState !== loadedState) {
     throw new Error(
-      '"state" value received from authentication server does no match client request. Possible cross-site request forgery',
+      '"state" value received from authentication server does no match client request. Possible cross-site request forgery'
     )
   }
 }
