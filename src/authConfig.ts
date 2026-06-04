@@ -17,7 +17,7 @@ export function createInternalConfig(passedConfig: TAuthConfig): TInternalConfig
     postLogin = () => null,
     loginMethod = 'redirect',
     onRefreshTokenExpire = undefined,
-    storage = 'local' as const,
+    storage = 'local',
     storageKeyPrefix = 'ROCP_',
     refreshWithScope = true,
     refreshTokenExpiryStrategy = 'renewable',
